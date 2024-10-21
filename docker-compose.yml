@@ -1,0 +1,31 @@
+services:
+
+  redis:
+    container_name: redis
+    image: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server
+    volumes:
+      - cache_data:/var/lib/redis/data
+    networks:
+      - cache_network
+
+  app:
+    container_name: app
+    build: .
+    restart: always
+    ports:
+      - "8000:8000"
+    command: uvicorn api.app:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      - redis
+    networks:
+      - cache_network
+
+volumes: 
+  cache_data:
+
+networks:
+  cache_network:
